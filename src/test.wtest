@@ -1,0 +1,90 @@
+import centrodistribucion.*
+import vendedores.*
+import clientes.*
+test "testX" {
+	const rosario = new Ciudad()
+	const santaFe = new Provincia()
+	rosario.provincia(santaFe)
+	const rafaela = new Ciudad()
+	rafaela.provincia(santaFe)
+	const ituzaingo = new Ciudad()
+	const buenosAires= new Provincia()
+	ituzaingo.provincia(buenosAires)
+	const hurlingham = new Ciudad()
+	hurlingham.provincia(buenosAires)
+	const moron = new Ciudad()
+	moron.provincia(buenosAires)
+	const cosquin = new Ciudad()
+	const cordoba = new Provincia()
+	cosquin.provincia(cordoba)
+	buenosAires.poblacion(80000)
+	santaFe.poblacion(20000)
+	cordoba.poblacion(60000)
+	
+	const comercio1 = new ComercioCorresponsal()
+	comercio1.agregarSucursal(ituzaingo)
+	comercio1.agregarSucursal(hurlingham)
+	comercio1.agregarSucursal(moron)
+	comercio1.agregarSucursal(rosario)
+	comercio1.agregarSucursal(rafaela)
+	
+	comercio1.agregarSucursal(moron)
+	
+	
+	const viajante1= new Viajante()
+	viajante1.estaHabilitado(buenosAires)
+	viajante1.estaHabilitado(santaFe)
+	
+	assert.that(comercio1.esInfluyente())
+	assert.notThat(viajante1.esInfluyente())
+	
+	const vendedorFijo1= new VendedorFijo(ciudad=ituzaingo)
+	
+	const cert1 = new Certificacion(puntos=20,esProducto=true)
+	const cert2 = new Certificacion(puntos=10,esProducto=false)
+	const cert3 = new Certificacion(puntos=15,esProducto=true)
+	const cert4 = new Certificacion(puntos=10,esProducto=false)
+	const cert5 = new Certificacion(puntos=20,esProducto=true)
+	const cert6 = new Certificacion(puntos=20,esProducto=false)
+	
+	vendedorFijo1.agregarCertificacion(cert1)
+	vendedorFijo1.agregarCertificacion(cert2)
+	vendedorFijo1.agregarCertificacion(cert3)
+	
+	comercio1.agregarCertificacion(cert1)
+	comercio1.agregarCertificacion(cert2)
+	
+	
+	viajante1.agregarCertificacion(cert5)
+	
+	vendedorFijo1.ciudad(ituzaingo)
+	const centro1 = new Centro(ciudad=ituzaingo)
+	centro1.agregarVendedor(vendedorFijo1)
+	centro1.agregarVendedor(comercio1)
+	centro1.agregarVendedor(viajante1)
+	
+	
+	
+	assert.equals(vendedorFijo1,centro1.vendedorEstrella())
+	
+	
+	assert.notThat(centro1.puedeCubrir(cosquin))
+	assert.that(centro1.puedeCubrir(ituzaingo))
+	assert.equals([vendedorFijo1,comercio1],centro1.vendedoresGenericosRegistrados())
+	assert.notThat(centro1.esRobusto())
+	assert.that(vendedorFijo1.tieneAfinidad(centro1))
+	assert.notThat(comercio1.tieneAfinidad(centro1))
+	assert.that(centro1.esCandidato(vendedorFijo1))
+	
+	const clienteInseguro = new ClienteInseguro()
+	const clienteDetallista = new ClienteDetallista()
+	const clienteHumanista = new ClienteHumanista()
+	
+	assert.that(clienteInseguro.puedeSerAtendido(vendedorFijo1))
+	assert.notThat(clienteInseguro.puedeSerAtendido(comercio1))
+	centro1.repartirCertificacion()
+	assert.that(clienteDetallista.puedeSerAtendido(vendedorFijo1))
+	assert.notThat(clienteDetallista.puedeSerAtendido(comercio1))
+	assert.that(clienteHumanista.puedeSerAtendido(viajante1))
+	assert.notThat(clienteHumanista.puedeSerAtendido(comercio1))
+}
